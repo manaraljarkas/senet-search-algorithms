@@ -267,7 +267,7 @@ public class Board {
         switch (index) {
             case 15: return "S";   // start back
             case 26: return "R";   //roadblock
-            case 27: return "W";   // water
+            case 27: return "P";   // pool
             case 28: return "3";
             case 29: return "2";
             case 30: return "F";   // free
