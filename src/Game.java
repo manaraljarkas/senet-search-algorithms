@@ -6,6 +6,9 @@ public class Game {
     private Board board;
     private Scanner scanner;
 
+    private Player humanColor;
+    private Player computerColor;
+
     public Game() {
         board = new Board();
         scanner = new Scanner(System.in);
@@ -16,6 +19,18 @@ public class Game {
         System.out.println("        WELCOME TO SENET");
         System.out.println("        WHITE vs BLACK");
         System.out.println("========================================\n");
+
+        // اختيار اللون
+        System.out.println("Choose your color:");
+        System.out.println("1 - WHITE");
+        System.out.println("2 - BLACK");
+
+        int choice = scanner.nextInt();
+        humanColor = (choice == 1) ? Player.WHITE : Player.BLACK;
+        computerColor = humanColor.opposite();
+
+        System.out.println("You play as: " + humanColor);
+        System.out.println("Computer plays as: " + computerColor + "\n");
 
         while (!board.isFinal()) {
             playTurn();
@@ -50,12 +65,25 @@ public class Game {
             System.out.println((i + 1) + ". " + moves.get(i));
         }
 
-        Move selected = getPlayerMove(moves);
+        // Move selected = getPlayerMove(moves);
+
+        Move selected;
+
+        if (current == humanColor) {
+            selected = getPlayerMove(moves);
+        } else {
+            selected = getComputerMove(moves);
+        }
 
         // ✅ تطبيق الحركة
         MoveRules.apply(board, selected);
 
         System.out.println("Applied move: " + selected + "\n");
+    }
+
+    private Move getComputerMove(List<Move> moves) {
+        System.out.println("Computer is thinking...");
+        return moves.get(0); // اختيار أول حركة فقط (بدائي)
     }
 
     private Move getPlayerMove(List<Move> moves) {
