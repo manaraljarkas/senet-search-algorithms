@@ -37,6 +37,10 @@ public class MoveRules {
     /* ====== APPLY MOVE ====== */
 
     public static void apply(Board b, Move m) {
+        apply(b, m, 0); // Default dice value for backward compatibility
+    }
+
+    public static void apply(Board b, Move m, int dice) {
         Player p = b.getCurrentPlayer();
         int pv = p.getValue();
     
@@ -81,7 +85,18 @@ public class MoveRules {
         // 7️⃣ وضع الحجر
         b.setPieceAt(m.to, pv);
     
-        // 8️⃣ تبديل الدور
+        // 8️⃣ علامة للفحص في الدور القادم للمواضع 28 و 29
+        if (m.to == 28) {
+            // وضع علامة للتحقق في الدور القادم
+            b.setNeedsCheck28(p, true);
+        }
+        
+        if (m.to == 29) {
+            // وضع علامة للتحقق في الدور القادم
+            b.setNeedsCheck29(p, true);
+        }
+    
+        // 9️⃣ تبديل الدور
         b.switchPlayer();
     }
     
@@ -116,6 +131,24 @@ public class MoveRules {
                 return;
             }
         }
+        b.setPieceAt(15, pv);
+    }
+
+    public static void sendBackFromSpecialPosition(Board b, Player p, int fromPosition) {
+        int pv = p.getValue();
+        
+        // إزالة الحجر من الموضع الخاص (28 أو 29)
+        b.removePieceAt(fromPosition);
+        
+        // البحث عن أقرب موضع متاح للخلف من 15
+        for (int i = 15; i >= 1; i--) {
+            if (b.getPieceAt(i) == 0) {
+                b.setPieceAt(i, pv);
+                return;
+            }
+        }
+        
+        // إذا لم يوجد موضع متاح، ضع الحجر في 15 (حتى لو كان مشغولاً)
         b.setPieceAt(15, pv);
     }
 }

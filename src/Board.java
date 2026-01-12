@@ -11,6 +11,11 @@ public class Board {
     private boolean whitePendingExit;
     private boolean blackPendingExit;
 
+    private boolean whiteNeedsCheck28;
+    private boolean blackNeedsCheck28;
+    private boolean whiteNeedsCheck29;
+    private boolean blackNeedsCheck29;
+
     public Board() {
         cells = new ArrayList<>(Collections.nCopies(30, 0));
         currentPlayer = Player.WHITE;
@@ -54,6 +59,24 @@ public class Board {
         else blackPendingExit = value;
     }
 
+    public boolean needsCheck28(Player p) {
+        return p == Player.WHITE ? whiteNeedsCheck28 : blackNeedsCheck28;
+    }
+
+    public void setNeedsCheck28(Player p, boolean value) {
+        if (p == Player.WHITE) whiteNeedsCheck28 = value;
+        else blackNeedsCheck28 = value;
+    }
+
+    public boolean needsCheck29(Player p) {
+        return p == Player.WHITE ? whiteNeedsCheck29 : blackNeedsCheck29;
+    }
+
+    public void setNeedsCheck29(Player p, boolean value) {
+        if (p == Player.WHITE) whiteNeedsCheck29 = value;
+        else blackNeedsCheck29 = value;
+    }
+
     public void pieceOut(Player p) {
         if (p == Player.WHITE) whiteOut++;
         else blackOut++;
@@ -79,6 +102,10 @@ public class Board {
         b.blackOut = blackOut;
         b.whitePendingExit = whitePendingExit;
         b.blackPendingExit = blackPendingExit;
+        b.whiteNeedsCheck28 = whiteNeedsCheck28;
+        b.blackNeedsCheck28 = blackNeedsCheck28;
+        b.whiteNeedsCheck29 = whiteNeedsCheck29;
+        b.blackNeedsCheck29 = blackNeedsCheck29;
         return b;
     }
 

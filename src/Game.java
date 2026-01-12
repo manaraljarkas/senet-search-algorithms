@@ -51,6 +51,9 @@ public class Game {
         int dice = Dice.throwSticks();
         Dice.displayThrow(dice);
 
+        // 🔍 فحص خاص للمواضع 28 و 29 بعد رمي العصي
+        checkSpecialPositionsAfterRoll(current, dice);
+
         // 🎯 توليد الحركات (من MoveRules)
         List<Move> moves = MoveRules.generateMoves(board, dice);
 
@@ -75,8 +78,8 @@ public class Game {
             selected = getComputerMove(moves);
         }
 
-        // ✅ تطبيق الحركة
-        MoveRules.apply(board, selected);
+        // ✅ تطبيق الحركة (مع قيمة النرد للتحقق من القواعد الخاصة)
+        MoveRules.apply(board, selected, dice);
 
         System.out.println("Applied move: " + selected + "\n");
     }
@@ -103,6 +106,34 @@ public class Game {
             }
 
             return moves.get(choice - 1);
+        }
+    }
+
+    private void checkSpecialPositionsAfterRoll(Player current, int dice) {
+        int pv = current.getValue();
+        
+        // فحص الموضع 28: يحتاج إلى 3 عصي
+        if (board.needsCheck28(current) && board.getPieceAt(28) == pv) {
+            if (dice != 3) {
+                // إذا لم يحصل على 3 عصي، ارجع الحجر إلى 15 أو أقرب موضع متاح للخلف
+                System.out.println("Stone on position 28 didn't get 3 sticks. Moving back...");
+                MoveRules.sendBackFromSpecialPosition(board, current, 28);
+                board.print(); // طباعة اللوحة بعد تحريك الحجر
+            }
+            // إزالة العلامة (فرصة واحدة فقط)
+            board.setNeedsCheck28(current, false);
+        }
+        
+        // فحص الموضع 29: يحتاج إلى 2 عصي
+        if (board.needsCheck29(current) && board.getPieceAt(29) == pv) {
+            if (dice != 2) {
+                // إذا لم يحصل على 2 عصي، ارجع الحجر إلى 15 أو أقرب موضع متاح للخلف
+                System.out.println("Stone on position 29 didn't get 2 sticks. Moving back...");
+                MoveRules.sendBackFromSpecialPosition(board, current, 29);
+                board.print(); // طباعة اللوحة بعد تحريك الحجر
+            }
+            // إزالة العلامة (فرصة واحدة فقط)
+            board.setNeedsCheck29(current, false);
         }
     }
 
