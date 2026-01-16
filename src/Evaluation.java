@@ -1,6 +1,6 @@
 public class Evaluation {
 
-    private int evaluate(Board board, Player ComputerPlayer) {
+    public int evaluate(Board board, Player ComputerPlayer) {
         int score = 0;
         Player opponent = ComputerPlayer.opposite();
 

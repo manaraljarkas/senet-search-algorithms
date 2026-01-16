@@ -8,6 +8,10 @@ public class Game {
 
     private Player humanColor;
     private Player computerColor;
+    private ExpectminmaxSolver solver;
+    private int searchDepth;
+    private boolean debugMode;
+    private int dice;
 
     public Game() {
         board = new Board();
@@ -31,6 +35,13 @@ public class Game {
 
         System.out.println("You play as: " + humanColor);
         System.out.println("Computer plays as: " + computerColor + "\n");
+        System.out.print("Enter search depth: ");
+        searchDepth = scanner.nextInt();
+
+        System.out.print("Enable algorithm debug? (1 = yes, 0 = no): ");
+        debugMode = scanner.nextInt() == 1;
+
+        solver = new ExpectminmaxSolver(searchDepth, debugMode);
 
         while (!board.isFinal()) {
             playTurn();
@@ -48,7 +59,7 @@ public class Game {
         System.out.println(">>> Turn: " + current);
 
         // 🎲 رمي العصي
-        int dice = Dice.throwSticks();
+         dice = Dice.throwSticks();
         Dice.displayThrow(dice);
 
         // 🔍 فحص خاص للمواضع 28 و 29 بعد رمي العصي
@@ -86,7 +97,8 @@ public class Game {
 
     private Move getComputerMove(List<Move> moves) {
         System.out.println("Computer is thinking...");
-        return moves.get(0); // اختيار أول حركة فقط (بدائي)
+      //  return moves.get(0); // اختيار أول حركة فقط (بدائي)
+        return solver.findBestMove(board, dice);
     }
 
     private Move getPlayerMove(List<Move> moves) {
