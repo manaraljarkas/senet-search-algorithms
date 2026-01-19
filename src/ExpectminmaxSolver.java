@@ -6,24 +6,31 @@ public class ExpectminmaxSolver {
     private int maxDepth;
     private boolean debug;
     private int visitedNodes;
-    private Evaluation evaluation ;
+    private Evaluation evaluation;
+    private Player computerPlayer;
+    private int lastMovedPiece = -1; // لتخزين آخر قطعة تم تحريكها
 
-    public ExpectminmaxSolver(int depth, boolean debug) {
+    public ExpectminmaxSolver(int depth, boolean debug, Player computerPlayer) {
         this.maxDepth = depth;
         this.debug = debug;
         this.visitedNodes = 0;
         this.evaluation = new Evaluation();
+        this.computerPlayer = computerPlayer;
     }
 
     /* =================================================
        اختيار أفضل حركة بعد الرمية الحالية
        ================================================= */
     public Move findBestMove(Board board, int dice) {
+        return findBestMove(board, dice, -1);
+    }
 
+    public Move findBestMove(Board board, int dice, int lastMovedPiece) {
+        this.lastMovedPiece = lastMovedPiece;
         visitedNodes = 0;
 
         Player current = board.getCurrentPlayer();
-        boolean isMax = (current == Player.WHITE);
+        boolean isMax = (current == computerPlayer);
 
         double bestValue = isMax ?
                 Double.NEGATIVE_INFINITY :
@@ -38,6 +45,18 @@ public class ExpectminmaxSolver {
             MoveRules.apply(copy, m, dice);
 
             double value = expectminmax(copy, maxDepth - 1, !isMax);
+
+            if (lastMovedPiece != -1 && m.from == lastMovedPiece) {
+                if (lastMovedPiece > 10) {
+                    value += 50;
+                } else if (lastMovedPiece >= 8) {
+                    value += 5;
+                }
+            }
+
+            if (m.from > 10) {
+                value += 20;
+            }
 
             if (isMax && value > bestValue) {
                 bestValue = value;
@@ -123,6 +142,6 @@ public class ExpectminmaxSolver {
     private double evaluate(Board board) {
        // return board.getScore(Player.WHITE)
          //- board.getScore(Player.BLACK);
-        return evaluation.evaluate(board, Player.BLACK);
+        return evaluation.evaluate(board, computerPlayer);
     }
 }

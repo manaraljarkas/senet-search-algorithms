@@ -1,50 +1,93 @@
 public class Evaluation {
 
-    public int evaluate(Board board, Player ComputerPlayer) {
+    public int evaluate(Board board, Player computerPlayer) {
+
         int score = 0;
-        Player opponent = ComputerPlayer.opposite();
+        Player opponent = computerPlayer.opposite();
 
         for (int i = 1; i <= 30; i++) {
-            int source = board.getPieceAt(i);
+            int piece = board.getPieceAt(i);
 
-            if (source == ComputerPlayer.getValue()) {
-                score += i * 2;
+            if (piece == computerPlayer.getValue()) {
+
+                boolean threatened = false;
+                for (int d = 1; d <= 5; d++) {
+                    int enemyPos = i - d;
+                    if (enemyPos >= 1 && board.getPieceAt(enemyPos) == opponent.getValue()) {
+                        threatened = true;
+                        switch (d) {
+                            case 1: score -= 40; break;
+                            case 2: score -= 70; break;
+                            case 3: score -= 45; break;
+                            case 4: score -= 25; break;
+                            case 5: score -= 15; break;
+                        }
+                    }
+                }
+
+                if (i >= 10) {
+                    if (!threatened) {
+                        score += (i - 10) * 4;
+                    } else {
+                        score -= 20;
+                    }
+                } else {
+                    score += i;
+                }
+
+                if (i >= 26 && i <= 30) {
+                    score += 40;
+                }
+
+                if (i == 26) {
+                    score += 80;
+                }
+
+                if (i == 27) {
+                    score -= 100;
+                }
+
+
+                if (i == 28) {
+                    score += 30;
+                }
+                if (i == 29) {
+                    score += 50;
+                }
+                if (i == 30) {
+                    score += 60;
+                }
+
+
+                if (i >= 21 && i <= 25) {
+                    score += (i - 20) * 3;
+                }
 
                 for (int dice = 1; dice <= 5; dice++) {
                     int target = i + dice;
                     if (target > 30) continue;
 
-                    int targetPiece = board.getPieceAt(target);
-                    if (targetPiece == opponent.getValue()) {
-                        score += 12;
+                    if (board.getPieceAt(target) == opponent.getValue()) {
+                        score += 15;
                     }
                 }
 
-                for (int dice = 1; dice <= 5; dice++) {
-                    int opponent_Position = i - dice;
-                    if (opponent_Position < 1) continue;
-
-                    int opponent_Piece = board.getPieceAt(opponent_Position);
-                    if (opponent_Piece == opponent.getValue()) {
-                        score -= 15;
-                    }
+                if (i < 30 && board.getPieceAt(i + 1) == opponent.getValue()) {
+                    score -= 15;
                 }
 
-            if (i == 26 ) {
-                score += 35;
             }
 
-            if (i == 27 ) {
-                score -= 50;
+            if (piece == opponent.getValue()) {
+                score -= i * 2;
+                if (i == 26) score -= 50; //
+                if (i >= 28 && i <= 30) score -= 30;
             }
+        }
 
-        }
-            score += 100 * board.getScore(ComputerPlayer);
-            score -= 100 * board.getScore(opponent);
-        }
+        score += 200 * board.getScore(computerPlayer);
+        score -= 200 * board.getScore(opponent);
 
         return score;
     }
-
 }
-

@@ -41,7 +41,7 @@ public class Game {
         System.out.print("Enable algorithm debug? (1 = yes, 0 = no): ");
         debugMode = scanner.nextInt() == 1;
 
-        solver = new ExpectminmaxSolver(searchDepth, debugMode);
+        solver = new ExpectminmaxSolver(searchDepth, debugMode, computerColor);
 
         while (!board.isFinal()) {
             playTurn();
@@ -86,7 +86,7 @@ public class Game {
         if (current == humanColor) {
             selected = getPlayerMove(moves);
         } else {
-            selected = getComputerMove(moves);
+            selected = getComputerMove(moves, dice);
         }
 
         // ✅ تطبيق الحركة (مع قيمة النرد للتحقق من القواعد الخاصة)
@@ -95,10 +95,25 @@ public class Game {
         System.out.println("Applied move: " + selected + "\n");
     }
 
-    private Move getComputerMove(List<Move> moves) {
+    private int lastMovedPiece = -1; // تتبع آخر قطعة حركها الكمبيوتر
+
+    private Move getComputerMove(List<Move> moves, int dice) {
         System.out.println("Computer is thinking...");
-      //  return moves.get(0); // اختيار أول حركة فقط (بدائي)
-        return solver.findBestMove(board, dice);
+
+        // أولًا: حاول تحريك آخر قطعة تم تحريكها إذا كانت الحركة ممكنة
+        Move lastPieceMove = null;
+        for (Move m : moves) {
+            if (m.from == lastMovedPiece) {
+                lastPieceMove = m;
+                break;
+            }
+        }
+
+        int pieceToPrioritize = (lastPieceMove != null && lastMovedPiece != -1) ? lastMovedPiece : -1;
+        Move bestMove = solver.findBestMove(board, dice, pieceToPrioritize);
+        
+        lastMovedPiece = bestMove.to;
+        return bestMove;
     }
 
     private Move getPlayerMove(List<Move> moves) {
