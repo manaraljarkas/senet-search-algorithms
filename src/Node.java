@@ -31,4 +31,11 @@ public class Node {
     public Board getState() {
         return state;
     }
+    public Move getAction() {
+        return this.action;
+    }
+
+    public int getDepth() {
+        return this.depth;
+    }
 }
