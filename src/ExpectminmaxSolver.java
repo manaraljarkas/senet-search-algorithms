@@ -48,9 +48,26 @@ public class ExpectminmaxSolver {
 
             // ===== Heuristic إضافي مرتبط بآخر قطعة =====
             Move action = child.getAction();
+
+            if (action.from == 26) {
+                if (dice == 3 || dice == 4 || dice == 5) {
+                    value += 350;
+                } else {
+                    value -= 20;
+                }
+            }
+            if (action.to == 26) {
+                value += 300;
+            }
+            if (board.getPieceAt(26) == computerPlayer.getValue()
+                    && dice >= 3 && dice <= 5
+                    && action.from != 26) {
+                value -= 300;
+            }
+
             if (lastMovedPiece != -1 && action.from == lastMovedPiece) {
                 if (lastMovedPiece > 10) {
-                    value += 50;
+                    value += 80;
                 } else if (lastMovedPiece >= 8) {
                     value += 5;
                 }
