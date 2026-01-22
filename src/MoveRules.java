@@ -31,6 +31,16 @@ public class MoveRules {
             moves.add(new Move(30, 31));
         }
 
+        // ➕ إذا في حجر على 28 وحصل على 3 عصي → أضيف خيار الخروج
+        if (b.getPieceAt(28) == pv && dice == 3) {
+            moves.add(new Move(28, 31));
+        }
+
+        // ➕ إذا في حجر على 29 وحصل على 2 عصي → أضيف خيار الخروج
+        if (b.getPieceAt(29) == pv && dice == 2) {
+            moves.add(new Move(29, 31));
+        }
+
         return moves;
     }
 
@@ -49,11 +59,20 @@ public class MoveRules {
             sendBackFromExit(b, p);
         }
 
-        // 2️⃣ خروج نهائي
-        if (m.from == 30 && m.to == 31) {
-            b.removePieceAt(30);
+        // 2️⃣ خروج نهائي (من 30، 28، أو 29)
+        if ((m.from == 30 && m.to == 31) || 
+            (m.from == 28 && m.to == 31) || 
+            (m.from == 29 && m.to == 31)) {
+            b.removePieceAt(m.from);
             b.pieceOut(p);
             b.setPendingExit(p, false);
+            // إزالة علامات الفحص إذا كانت موجودة
+            if (m.from == 28) {
+                b.setNeedsCheck28(p, false);
+            }
+            if (m.from == 29) {
+                b.setNeedsCheck29(p, false);
+            }
             b.switchPlayer();
             return;
         }

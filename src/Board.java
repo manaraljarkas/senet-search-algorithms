@@ -15,6 +15,10 @@ public class Board {
     private boolean blackNeedsCheck28;
     private boolean whiteNeedsCheck29;
     private boolean blackNeedsCheck29;
+    private boolean whiteMustMoveBack28;
+    private boolean blackMustMoveBack28;
+    private boolean whiteMustMoveBack29;
+    private boolean blackMustMoveBack29;
 
     public Board() {
         cells = new ArrayList<>(Collections.nCopies(30, 0));
@@ -77,6 +81,24 @@ public class Board {
         else blackNeedsCheck29 = value;
     }
 
+    public boolean mustMoveBack28(Player p) {
+        return p == Player.WHITE ? whiteMustMoveBack28 : blackMustMoveBack28;
+    }
+
+    public void setMustMoveBack28(Player p, boolean value) {
+        if (p == Player.WHITE) whiteMustMoveBack28 = value;
+        else blackMustMoveBack28 = value;
+    }
+
+    public boolean mustMoveBack29(Player p) {
+        return p == Player.WHITE ? whiteMustMoveBack29 : blackMustMoveBack29;
+    }
+
+    public void setMustMoveBack29(Player p, boolean value) {
+        if (p == Player.WHITE) whiteMustMoveBack29 = value;
+        else blackMustMoveBack29 = value;
+    }
+
     public void pieceOut(Player p) {
         if (p == Player.WHITE) whiteOut++;
         else blackOut++;
@@ -106,6 +128,10 @@ public class Board {
         b.blackNeedsCheck28 = blackNeedsCheck28;
         b.whiteNeedsCheck29 = whiteNeedsCheck29;
         b.blackNeedsCheck29 = blackNeedsCheck29;
+        b.whiteMustMoveBack28 = whiteMustMoveBack28;
+        b.blackMustMoveBack28 = blackMustMoveBack28;
+        b.whiteMustMoveBack29 = whiteMustMoveBack29;
+        b.blackMustMoveBack29 = blackMustMoveBack29;
         return b;
     }
 

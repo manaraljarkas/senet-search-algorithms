@@ -62,7 +62,7 @@ public class Game {
          dice = Dice.throwSticks();
         Dice.displayThrow(dice);
 
-        // 🔍 فحص خاص للمواضع 28 و 29 بعد رمي العصي
+        // 🔍 فحص خاص للمواضع 28 و 29 بعد رمي العصي (إذا لم يحصل على العصي المطلوبة)
         checkSpecialPositionsAfterRoll(current, dice);
 
         // 🎯 توليد الحركات (من MoveRules)
@@ -93,6 +93,9 @@ public class Game {
         MoveRules.apply(board, selected, dice);
 
         System.out.println("Applied move: " + selected + "\n");
+
+        // 🔍 فحص خاص: إذا كان الحجر لا يزال على 28 أو 29 بعد الحركة وكان لديه فرصة للخروج
+        checkSpecialPositionsAfterMove(current, dice);
     }
 
     private int lastMovedPiece = -1; // تتبع آخر قطعة حركها الكمبيوتر
@@ -139,27 +142,67 @@ public class Game {
     private void checkSpecialPositionsAfterRoll(Player current, int dice) {
         int pv = current.getValue();
         
+        // فحص الموضع 28: إذا كان يجب تحريكه في هذا الدور (من الدور السابق)
+        if (board.mustMoveBack28(current) && board.getPieceAt(28) == pv) {
+            System.out.println("Stone on position 28 didn't exit when it had the chance. Moving back...");
+            MoveRules.sendBackFromSpecialPosition(board, current, 28);
+            board.print(); // طباعة اللوحة بعد تحريك الحجر
+            board.setMustMoveBack28(current, false);
+            board.setNeedsCheck28(current, false);
+        }
+        
+        // فحص الموضع 29: إذا كان يجب تحريكه في هذا الدور (من الدور السابق)
+        if (board.mustMoveBack29(current) && board.getPieceAt(29) == pv) {
+            System.out.println("Stone on position 29 didn't exit when it had the chance. Moving back...");
+            MoveRules.sendBackFromSpecialPosition(board, current, 29);
+            board.print(); // طباعة اللوحة بعد تحريك الحجر
+            board.setMustMoveBack29(current, false);
+            board.setNeedsCheck29(current, false);
+        }
+        
         // فحص الموضع 28: يحتاج إلى 3 عصي
+        // إذا لم يحصل على 3 عصي، ارجع الحجر فورًا
         if (board.needsCheck28(current) && board.getPieceAt(28) == pv) {
             if (dice != 3) {
                 // إذا لم يحصل على 3 عصي، ارجع الحجر إلى 15 أو أقرب موضع متاح للخلف
                 System.out.println("Stone on position 28 didn't get 3 sticks. Moving back...");
                 MoveRules.sendBackFromSpecialPosition(board, current, 28);
                 board.print(); // طباعة اللوحة بعد تحريك الحجر
+                // إزالة العلامة (فرصة واحدة فقط)
+                board.setNeedsCheck28(current, false);
             }
-            // إزالة العلامة (فرصة واحدة فقط)
-            board.setNeedsCheck28(current, false);
+            // إذا حصل على 3 عصي، لا نزيل العلامة بعد - سنتحقق بعد الحركة
         }
         
         // فحص الموضع 29: يحتاج إلى 2 عصي
+        // إذا لم يحصل على 2 عصي، ارجع الحجر فورًا
         if (board.needsCheck29(current) && board.getPieceAt(29) == pv) {
             if (dice != 2) {
                 // إذا لم يحصل على 2 عصي، ارجع الحجر إلى 15 أو أقرب موضع متاح للخلف
                 System.out.println("Stone on position 29 didn't get 2 sticks. Moving back...");
                 MoveRules.sendBackFromSpecialPosition(board, current, 29);
                 board.print(); // طباعة اللوحة بعد تحريك الحجر
+                // إزالة العلامة (فرصة واحدة فقط)
+                board.setNeedsCheck29(current, false);
             }
-            // إزالة العلامة (فرصة واحدة فقط)
+            // إذا حصل على 2 عصي، لا نزيل العلامة بعد - سنتحقق بعد الحركة
+        }
+    }
+
+    private void checkSpecialPositionsAfterMove(Player current, int dice) {
+        int pv = current.getValue();
+        
+        // فحص الموضع 28: إذا حصل على 3 عصي ولكن لم يخرج
+        if (board.needsCheck28(current) && board.getPieceAt(28) == pv && dice == 3) {
+            // الحجر لا يزال على 28 رغم وجود خيار الخروج - سيتم تحريكه في الدور القادم
+            board.setMustMoveBack28(current, true);
+            board.setNeedsCheck28(current, false);
+        }
+        
+        // فحص الموضع 29: إذا حصل على 2 عصي ولكن لم يخرج
+        if (board.needsCheck29(current) && board.getPieceAt(29) == pv && dice == 2) {
+            // الحجر لا يزال على 29 رغم وجود خيار الخروج - سيتم تحريكه في الدور القادم
+            board.setMustMoveBack29(current, true);
             board.setNeedsCheck29(current, false);
         }
     }
